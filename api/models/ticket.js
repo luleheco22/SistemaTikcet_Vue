@@ -13,7 +13,9 @@ const ticketSchema= new Schema({
     },
     tipo_ticket:{
         type: Schema.Types.ObjectId, ref:'categoria',
-        required:true 
+        required:true ,
+        unique:false
+        
     },
     asignado:{
         type: Schema.Types.ObjectId, ref:'usuario',

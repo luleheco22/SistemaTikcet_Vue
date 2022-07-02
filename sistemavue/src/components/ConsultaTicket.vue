@@ -121,7 +121,7 @@
 
                 <template v-slot:no-data>
                     <v-btn color="primary" @click="listar()">
-                        Reset
+                        No tiene tickets
                     </v-btn>
                 </template>
             </v-data-table>
@@ -157,7 +157,7 @@ export default {
         asignado: '',
         usuarios: [],
         solicitante: '',
-        personas: [],
+        personas:[],
         prioridad: '',
         prioridades: ['Urgente', 'Alta', 'Media', 'Baja'],
         valida: 0,
@@ -216,10 +216,9 @@ export default {
                 let configuracion = { headers: header }
                 const get = await axios.get('usuario/list', configuracion)
                 const data = get.data
-                console.log(data)
                 asignadoArr = data
                 asignadoArr
-                    .filter((f) => f.rol !== 'Administrador')
+                    .filter((f) => f.rol ==='Analista')
                     .map((c) => {
                         me.usuarios.push({
                             text: c.nombre,
@@ -231,15 +230,23 @@ export default {
             }
         },
         async selectSolicitante() {
+          
+ 
+            
+            
             try {
                 let me = this
                 let solicitanteArr = []
+                let usuario={'Usuario':this.$store.state.usuario}
+                let nombre_usuario=usuario.Usuario.nombre
                 let header = { 'Token': this.$store.state.token }
                 let configuracion = { headers: header }
                 const get = await axios.get('persona/list', configuracion)
                 const data = get.data
                 solicitanteArr = data
-                solicitanteArr.map((c) => {
+                solicitanteArr
+                .filter((f)=>f.nombre===nombre_usuario)
+                .map((c) => {
                     me.personas.push({
                         text: c.nombre,
                         value: c._id
@@ -248,16 +255,29 @@ export default {
             } catch (error) {
                 console.log(error)
             }
+            
         },
 
         async listar() {
             try {
                 let me = this
                 let header = { 'Token': this.$store.state.token }
+                let usuario={'Usuario':this.$store.state.usuario}
                 let configuracion = { headers: header }
-                const get = await axios.get('ticket/list', configuracion)
-                const data = get.data
-                me.tickets = data
+                let nombre_usuario=usuario.Usuario.nombre
+                const get = await axios.get('ticket/listByUser', configuracion)
+                const data = get.data.filter((d)=>{
+                    return d.solicitante.nombre===nombre_usuario
+                 })
+                 console.log(data)
+                 if (data) {
+                     me.tickets = data
+                 }else{
+                    return null
+                 }
+                
+                    
+               
             } catch (error) {
                 console.log(error)
             }

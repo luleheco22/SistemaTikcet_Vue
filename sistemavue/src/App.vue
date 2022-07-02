@@ -90,7 +90,7 @@
             </v-list-item>
           </v-list-group>
         </template>
-        <template  v-if="esAdministrador || esGerente || esAnalista || esCliente">
+        <template  v-if="esAdministrador || esCliente">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -109,16 +109,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item :to="{name: ''}">
-              <v-list-item-action>
-                <v-icon>table_chart</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>
-                  Consulta Clientes
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
+          
           </v-list-group>
         </template>   
       </v-list>

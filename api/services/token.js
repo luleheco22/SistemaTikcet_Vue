@@ -13,6 +13,7 @@ async function checkToken(token){
     }
 
     const user= await Usuario.findOne({_id:idt,estado:1})
+    console.log(user)
     if (user) {
         const token=jwt.sign({_id:idt},'claveSecreta',{expiresIn:'1d'})
         return {token,rol:user.rol}
@@ -23,8 +24,8 @@ async function checkToken(token){
 
 
 export default{
-    encode: async(_id,rol,email)=>{
-       const token=jwt.sign({_id,rol,email},'claveSecreta',{expiresIn:'1d'})
+    encode: async(_id,rol,email,nombre)=>{
+       const token=jwt.sign({_id,rol,email,nombre},'claveSecreta',{expiresIn:'1d'})
        return token
     },
 

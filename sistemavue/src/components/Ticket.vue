@@ -158,8 +158,13 @@ export default {
         usuarios: [],
         solicitante: '',
         personas: [],
-        prioridad: '',
-        prioridades: ['Urgente', 'Alta', 'Media', 'Baja'],
+        prioridad: [],
+        prioridades: [
+            {text:'Urgente', value:'Urgente'},
+            {text:'Alta', value:'Alta'},
+            {text:'Media', value:'Media'},
+            {text:'Baja', value:'Baja'},
+         ],
         valida: 0,
         validaMensaje: [],
         adModal: 0,
@@ -268,9 +273,6 @@ export default {
             this._id = '';
             this.titulo = '';
             this.descripcion = '';
-            this.tipo_ticket = '',
-            this.asignado = '',
-            this.solicitante = '',
             this.prioridad = '',
             this.valida = 0;
             this.validaMensaje = [];
@@ -356,9 +358,9 @@ export default {
             this._id = item._id;
             this.titulo = item.titulo;
             this.descripcion = item.descripcion;
-            this.tipo_ticket = item.tipo_ticket,
-            this.asignado = item.asignado,
-            this.solicitante = item.solicitante,
+            this.tipo_ticket = item.tipo_ticket._id,
+            this.asignado = item.asignado._id,
+            this.solicitante = item.solicitante._id,
             this.prioridad = item.prioridad,
             this.dialog = true
             this.editedIndex = 1;

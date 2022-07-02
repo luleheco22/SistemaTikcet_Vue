@@ -8,7 +8,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     token:null,
-    usuario:null
+    usuario:null,
+    name:null,
+    _id:null
   },
   getters: {
   },
@@ -19,12 +21,20 @@ export default new Vuex.Store({
     
     setUsuario(state,usuario){
          state.usuario=usuario
+    },
+    setName(state,name){
+         state.name=name
+    },
+    setId(state,_id){
+         state._id=_id
     }
   },
   actions: {
     guardarToken({commit},token){
       commit("setToken", token)
       commit("setUsuario", decode(token))
+      commit("setName", decode(token))
+      commit("setId", decode(token))
       localStorage.setItem("token", token)
        
     },
@@ -34,6 +44,8 @@ export default new Vuex.Store({
       if(token) {
       commit("setToken", token)
       commit("setUsuario", decode(token))
+      commit("setName", decode(token))
+      commit("setId", decode(token))
       }
       router.push({name: 'home'})
      
@@ -42,6 +54,8 @@ export default new Vuex.Store({
     salir({commit}){
       commit("setToken", null)
       commit("setUsuario", null)
+      commit("setName", null)
+      commit("setId",null)
       localStorage.removeItem("token")
       router.push({name: 'login'})
      
