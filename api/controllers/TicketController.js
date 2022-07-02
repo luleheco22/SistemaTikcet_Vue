@@ -61,26 +61,25 @@ export default{
    }
 },
   listByUser: async(req,res,next)=>{
-  
-    const {_id}=req.query
-       try {
-        const reg=await Ticket.findOne({_id:_id})
-        .populate('asignado',{nombre:1})
-        .populate('solicitante',{nombre:1})
-        .populate('tipo_ticket',{nombre:1})
-        if (!reg) {
-            res.status(404).send({
-                message:'El registro no existe'
-            })
-        }else{
-            res.status(200).json(reg)
-        }
-       } catch (error) {
-        res.status(500).send({
-            message:'Ocurrio un error'
-        });
-        next(error)
-      }
+    try {
+      let valor=req.query.valor
+      const reg= await Ticket.find(
+          {$or:[{'prioridad':new RegExp(valor,'i')}
+  ]
+      
+      })
+      .populate('asignado',{nombre:1})
+      .populate('solicitante',{nombre:1})
+      .populate('tipo_ticket',{nombre:1})
+      .sort({'createdAt':-1}) //ordena de manera desc
+      res.status(200).json(reg)
+
+  } catch (error) {
+   res.status(500).send({
+       message:'Ocurrio un error'
+   });
+   next(error)
+ }
 },
 
 update: async(req,res,next)=>{

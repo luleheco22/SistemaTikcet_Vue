@@ -5,7 +5,7 @@
 
       <v-col class="mb-4">
         <h1 class="display-2 font-weight-bold mb-3">
-         Bienvenido
+         Bienvenido  {{usuarioZ}}
         </h1>
 
        
@@ -16,10 +16,27 @@
 
 <script>
   export default {
-    name: 'HelloWorld',
+    
 
-    data: () => ({
-     
-    }),
+   data(){
+        return {
+          usuarioZ:''
+        }
+    },
+        created() {
+        this.usuarioM()
+      
+    },
+    methods: {
+        usuarioM(){
+          let me=this
+           let  usuario={'Usuario':this.$store.state.usuario}
+       console.log(usuario.Usuario.nombre)
+       return me.usuarioZ=usuario.Usuario.nombre
+
+        },
+      
+    }
   }
+  
 </script>

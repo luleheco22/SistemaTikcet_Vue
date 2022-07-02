@@ -4,7 +4,6 @@ const categoriaSchema=new Schema({
     nombre:{
         type:String, 
         maxlength:50,
-        unique:true,
          required:true},
 
     descripcion:{

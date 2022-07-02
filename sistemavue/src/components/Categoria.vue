@@ -342,10 +342,7 @@ import axios from 'axios'
         }
      },
 
-      deleteItemConfirm () {
-        this.desserts.splice(this.editedIndex, 1)
-        this.closeDelete()
-      },
+   
 
       close () {
         this.dialog = false
