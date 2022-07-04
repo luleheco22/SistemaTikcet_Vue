@@ -73,11 +73,11 @@
                                     Activar Item
                                 </v-card-title>
                                 <v-card-title class="headline" v-if="adAccion == 2">
-                                    Desactivar Item
+                                    Eliminar Item
                                 </v-card-title>
                                 <v-card-text>
                                     Estás a punto de <span v-if="adAccion == 1">activar </span>
-                                    <span v-if="adAccion == 2">desactivar </span> el item {{ adNombre }}
+                                    <span v-if="adAccion == 2">Eliminar </span> el item {{ adNombre }}
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
@@ -88,7 +88,7 @@
                                         Activar
                                     </v-btn>
                                     <v-btn v-if="adAccion == 2" @click="desactivar()" color="orange darken-4" text="text">
-                                        Desactivar
+                                        Eliminar
                                     </v-btn>
                                 </v-card-actions>
                             </v-card>
@@ -96,12 +96,14 @@
                     </v-toolbar>
                 </template>
                 <template v-slot:item.opciones="{ item }">
+                    <template v-if="item.permiso===1">
                     <v-icon small class="mr-2" @click="editItem(item)">
                         edit
                     </v-icon>
+                    </template>
                     <template v-if="item.estado">
                         <v-icon small @click="activarDesactivarMostrar(2, item)">
-                            block
+                            delete
                         </v-icon>
                     </template>
                     <template v-else="item.estado">
@@ -111,12 +113,18 @@
                     </template>
                 </template>
                 <template v-slot:item.estado="{ item }">
-                    <div v-if="item.estado">
+                    <div v-if="item.estado===1">
                         <span class="blue--text">Activo</span>
                     </div>
-                    <div v-else>
+                    <div v-if="item.estado===0">
                         <span class="red--text">Inactivo</span>
                     </div>
+                    <div v-if="item.estado===2">
+                        <span class="green--text">Cerrado</span>
+                    </div>
+                </template>
+                <template v-slot:item.createAt="{ item }">
+                       {{item.createAt.slice(0,10)}}
                 </template>
 
                 <template v-slot:no-data>
@@ -145,7 +153,9 @@ export default {
             { text: 'Asignado', value: 'asignado.nombre', sortable: false },
             { text: 'Solicitante', value: 'solicitante.nombre', sortable: false },
             { text: 'Prioridad', value: 'prioridad', sortable: false },
+            { text: 'Fecha', value: `createAt`, sortable: true },
             { text: 'Estado', value: 'estado', sortable: false },
+            
 
         ],
         editedIndex: -1,
@@ -159,18 +169,20 @@ export default {
         solicitante: '',
         personas:[],
         prioridad: '',
+        createAt:'',
         prioridades: ['Urgente', 'Alta', 'Media', 'Baja'],
         valida: 0,
         validaMensaje: [],
         adModal: 0,
         adAccion: 0,
         adNombre: '',
-        adId: ''
+        adId: '',
+       
     }),
 
     computed: {
         formTitle() {
-            return this.editedIndex === -1 ? 'Nuevo Registro' : 'Editar Registro'
+            return this.editedIndex === -1 ? 'Nuevo Registro' : 'Editar Registro, Solo se puede editar 1 vez'
         },
     },
 
@@ -198,7 +210,11 @@ export default {
                 const get = await axios.get('categoria/list', configuracion)
                 const data = get.data
                 categoriaArr = data
-                categoriaArr.map((c) => {
+                categoriaArr
+                 .filter((f)=>{
+                   return f.estado===1
+                })
+                .map((c) => {
                     me.categorias.push({
                         text: c.nombre,
                         value: c._id
@@ -218,7 +234,7 @@ export default {
                 const data = get.data
                 asignadoArr = data
                 asignadoArr
-                    .filter((f) => f.rol ==='Analista')
+                    .filter((f) => f.rol ==='Analista' && f.estado===1)
                     .map((c) => {
                         me.usuarios.push({
                             text: c.nombre,
@@ -266,8 +282,9 @@ export default {
                 let configuracion = { headers: header }
                 let nombre_usuario=usuario.Usuario.nombre
                 const get = await axios.get('ticket/listByUser', configuracion)
-                const data = get.data.filter((d)=>{
-                    return d.solicitante.nombre===nombre_usuario
+                const data = get.data
+                .filter((d)=>{
+                    return d.solicitante.nombre===nombre_usuario && d.estado===1 
                  })
                  console.log(data)
                  if (data) {
@@ -291,6 +308,7 @@ export default {
             this.asignado = '',
             this.solicitante = '',
             this.prioridad = '',
+            this.createAt= '',
             this.valida = 0;
             this.validaMensaje = [];
             this.editedIndex = -1
@@ -333,7 +351,8 @@ export default {
                 }
                 if (this.editedIndex > -1) {
                     //Editar
-                    await axios.put('ticket/update', {
+                    me.desactivarPermiso(this._id)
+                          await axios.put('ticket/update', {
                        '_id': this._id,
                         'titulo': this.titulo,
                         'descripcion': this.descripcion,
@@ -345,6 +364,8 @@ export default {
                     me.limpiar()
                     me.close()
                     me.listar()
+                    
+                  
                 } else {
                     //Guardar
                     await axios.post('ticket/add', {
@@ -373,6 +394,7 @@ export default {
 
         editItem(item) {
             this._id = item._id;
+            this.permiso=0
             this.titulo = item.titulo;
             this.descripcion = item.descripcion;
             this.tipo_ticket = item.tipo_ticket,
@@ -381,6 +403,7 @@ export default {
             this.prioridad = item.prioridad,
             this.dialog = true
             this.editedIndex = 1;
+            
         },
 
         activarDesactivarMostrar(accion, item) {
@@ -392,7 +415,10 @@ export default {
                 this.adAccion = 1
             } else if (accion == 2) {
                 this.adAccion = 2
-            } else {
+            }else if (accion == 3) {
+                this.adAccion = 2
+            } 
+            else {
                 this.addModal = 0
             }
         },
@@ -441,6 +467,34 @@ export default {
                 console.log(error)
             }
         },
+        async activarPermiso(item) {
+           
+            try {
+                let me = this
+                let header = { 'Token': this.$store.state.token }
+                let configuracion = { headers: header }
+                await axios.put('ticket/activarPermiso', {
+                    '_id': item
+                }, configuracion)
+
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async desactivarPermiso(item) {
+              console.log(item,'acaaaa')
+            try {
+                let me = this
+                let header = { 'Token': this.$store.state.token }
+                let configuracion = { headers: header }
+                await axios.put('ticket/desactivarPermiso', {
+                    '_id': item
+                }, configuracion)
+
+            } catch (error) {
+                console.log(error)
+            }
+        },
 
      
 
@@ -448,13 +502,7 @@ export default {
             this.dialog = false
         },
 
-        closeDelete() {
-            this.dialogDelete = false
-            this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
-            })
-        },
+       
 
     },
 }

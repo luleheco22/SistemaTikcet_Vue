@@ -5,8 +5,11 @@
 
       <v-col class="mb-4">
         <h1 class="display-2 font-weight-bold mb-3">
-         Bienvenido  {{usuarioZ}}
+         Bienvenido  {{usuarioZ}} 
         </h1>
+        <h2>
+          Rol:{{usuarioRol}}
+        </h2>
 
        
       </v-col>
@@ -20,7 +23,8 @@
 
    data(){
         return {
-          usuarioZ:''
+          usuarioZ:'',
+          usuarioRol:''
         }
     },
         created() {
@@ -31,8 +35,9 @@
         usuarioM(){
           let me=this
            let  usuario={'Usuario':this.$store.state.usuario}
-       console.log(usuario.Usuario.nombre)
-       return me.usuarioZ=usuario.Usuario.nombre
+       
+        me.usuarioZ=usuario.Usuario.nombre
+        me.usuarioRol=usuario.Usuario.rol
 
         },
       

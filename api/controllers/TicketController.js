@@ -72,6 +72,8 @@ export default{
       .populate('solicitante',{nombre:1})
       .populate('tipo_ticket',{nombre:1})
       .sort({'createdAt':-1}) //ordena de manera desc
+    
+
       res.status(200).json(reg)
 
   } catch (error) {
@@ -131,6 +133,62 @@ update: async(req,res,next)=>{
           },
           {
             estado:0
+          })  
+         
+          res.status(200).json(reg)
+    } catch (error) {
+     res.status(500).send({
+         message:'Ocurrio un error'
+     });
+     next(error)
+   }
+},
+  activarPermiso: async(req,res,next)=>{
+    const {_id}=req.body
+    try {
+        const reg= await Ticket.findByIdAndUpdate({
+            _id:_id
+          },
+          {
+            permiso:1
+          })  
+         
+          res.status(200).json(reg)
+    } catch (error) {
+     res.status(500).send({
+         message:'Ocurrio un error'
+     });
+     next(error)
+   }
+},
+  desactivarPermiso: async(req,res,next)=>{
+    const {_id}=req.body
+    console.log(_id)
+    try {
+        const reg= await Ticket.findByIdAndUpdate({
+            _id:_id
+          },
+          {
+            permiso:0
+          })  
+         
+         
+          res.status(200).json(reg)
+    } catch (error) {
+     res.status(500).send({
+         message:'Ocurrio un error'
+     });
+     next(error)
+   }
+},
+  close: async(req,res,next)=>{
+    const {_id}=req.body
+    try {
+        const reg= await Ticket.findByIdAndUpdate({
+            _id:_id
+          },
+          {
+            estado:2
           })  
          
           res.status(200).json(reg)

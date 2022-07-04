@@ -34,6 +34,10 @@ const ticketSchema= new Schema({
         type:Number,
         default:1
     },
+    permiso:{
+        type:Number,
+        default:1
+    },
     createAt:{
         type:Date,
         default:Date.now

@@ -70,14 +70,20 @@
                         <v-dialog v-model="adModal" max-width="290">
                             <v-card>
                                 <v-card-title class="headline" v-if="adAccion == 1">
-                                    Activar Item
+                                    Activar Ticket
                                 </v-card-title>
                                 <v-card-title class="headline" v-if="adAccion == 2">
-                                    Desactivar Item
+                                    Desactivar Ticket
+                                </v-card-title>
+                                <v-card-title class="headline" v-if="adAccion == 3">
+                                    Cerrar Ticket
                                 </v-card-title>
                                 <v-card-text>
                                     Estás a punto de <span v-if="adAccion == 1">activar </span>
-                                    <span v-if="adAccion == 2">desactivar </span> el item {{ adNombre }}
+                                    <span v-if="adAccion == 2">desactivar </span>
+                                    <span v-if="adAccion == 3">cerrar </span>
+                                    
+                                    el ticket {{ adNombre }}
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
@@ -90,6 +96,9 @@
                                     <v-btn v-if="adAccion == 2" @click="desactivar()" color="orange darken-4" text="text">
                                         Desactivar
                                     </v-btn>
+                                    <v-btn v-if="adAccion == 3" @click="cerrar()" color="orange darken-4" text="text">
+                                        Cerrar
+                                    </v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-dialog>
@@ -101,7 +110,7 @@
                     </v-icon>
                     <template v-if="item.estado">
                         <v-icon small @click="activarDesactivarMostrar(2, item)">
-                            block
+                            delete
                         </v-icon>
                     </template>
                     <template v-else="item.estado">
@@ -109,14 +118,24 @@
                             check
                         </v-icon>
                     </template>
+                    <v-icon small class="mr-2"  @click="activarDesactivarMostrar(3, item)">
+                        block
+                    </v-icon>
                 </template>
                 <template v-slot:item.estado="{ item }">
-                    <div v-if="item.estado">
+                    <div v-if="item.estado===1">
                         <span class="blue--text">Activo</span>
                     </div>
-                    <div v-else>
+                    <div v-if="item.estado===0">
                         <span class="red--text">Inactivo</span>
                     </div>
+                    <div v-if="item.estado===2">
+                        <span class="green--text">Cerrado</span>
+                    </div>
+                 
+                </template>
+                <template v-slot:item.createAt="{ item }">
+                       {{item.createAt.slice(0,10)}}
                 </template>
 
                 <template v-slot:no-data>
@@ -145,6 +164,7 @@ export default {
             { text: 'Asignado', value: 'asignado.nombre', sortable: false },
             { text: 'Solicitante', value: 'solicitante.nombre', sortable: false },
             { text: 'Prioridad', value: 'prioridad', sortable: false },
+             { text: 'Fecha', value: `createAt`, sortable: true },
             { text: 'Estado', value: 'estado', sortable: false },
 
         ],
@@ -165,6 +185,7 @@ export default {
             {text:'Media', value:'Media'},
             {text:'Baja', value:'Baja'},
          ],
+         createAt:'',
         valida: 0,
         validaMensaje: [],
         adModal: 0,
@@ -203,7 +224,11 @@ export default {
                 const get = await axios.get('categoria/list', configuracion)
                 const data = get.data
                 categoriaArr = data
-                categoriaArr.map((c) => {
+                categoriaArr
+                .filter((f)=>{
+                   return f.estado===1
+                })
+                .map((c) => {
                     me.categorias.push({
                         text: c.nombre,
                         value: c._id
@@ -224,7 +249,7 @@ export default {
                 console.log(data)
                 asignadoArr = data
                 asignadoArr
-                    .filter((f) => f.rol !== 'Administrador' && f.rol!=='Cliente')
+                    .filter((f) => f.rol !== 'Administrador' && f.rol!=='Cliente' && f.estado===1)
                     .map((c) => {
                         me.usuarios.push({
                             text: c.nombre,
@@ -245,6 +270,9 @@ export default {
                 const data = get.data
                 solicitanteArr = data
                 solicitanteArr
+                 .filter((f)=>{
+                   return f.estado===1
+                })
                 .map((c) => {
                     me.personas.push({
                         text: c.nombre,
@@ -274,6 +302,7 @@ export default {
             this.titulo = '';
             this.descripcion = '';
             this.prioridad = '',
+            this.createAt='',
             this.valida = 0;
             this.validaMensaje = [];
             this.editedIndex = -1
@@ -375,7 +404,10 @@ export default {
                 this.adAccion = 1
             } else if (accion == 2) {
                 this.adAccion = 2
-            } else {
+            } else if (accion == 3) {
+                this.adAccion = 3
+            }
+             else {
                 this.addModal = 0
             }
         },
@@ -410,6 +442,26 @@ export default {
                 let header = { 'Token': this.$store.state.token }
                 let configuracion = { headers: header }
                 await axios.put('ticket/desactivate', {
+                    '_id': this.adId
+                }, configuracion)
+                me.adModal = 0
+                me.adAccion = 0
+                me.adNombre = ''
+                me.adId = ''
+                me.limpiar()
+                me.close()
+                me.listar()
+
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async cerrar() {
+            try {
+                let me = this
+                let header = { 'Token': this.$store.state.token }
+                let configuracion = { headers: header }
+                await axios.put('ticket/close', {
                     '_id': this.adId
                 }, configuracion)
                 me.adModal = 0
