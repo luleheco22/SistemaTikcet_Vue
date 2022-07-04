@@ -17,7 +17,7 @@
             </v-list-item-title>
           </v-list-item>
         </template>
-        <template  v-if="esAdministrador || esGerente">
+        <template  v-if="esAdministrador || esGerente || esAnalista">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -36,6 +36,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            
             <v-list-item :to="{name: 'ticket'}">
               <v-list-item-action>
                 <v-icon>table_chart</v-icon>

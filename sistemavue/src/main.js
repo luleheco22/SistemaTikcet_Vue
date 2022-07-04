@@ -5,7 +5,7 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import axios from 'axios'
 Vue.config.productionTip = false
-axios.defaults.baseURL='http://localhost:4000/api/'
+axios.defaults.baseURL='https://sistema-ticket-vue-leonel.herokuapp.com/api/'
 
 new Vue({
   router,
