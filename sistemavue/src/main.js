@@ -5,7 +5,7 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import axios from 'axios'
 Vue.config.productionTip = false
-axios.defaults.baseURL='https://sistema-ticket-vue-leonel.herokuapp.com/api/'
+axios.defaults.baseURL='https://backsustematicket-production.up.railway.app/'
 
 new Vue({
   router,
