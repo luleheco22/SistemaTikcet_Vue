@@ -6,7 +6,7 @@ import vuetify from './plugins/vuetify'
 import axios from 'axios'
 Vue.config.productionTip = false
 //Railway 
-axios.defaults.baseURL='https://backsustematicket-production.up.railway.app/'
+axios.defaults.baseURL='https://backsustematicket-production.up.railway.app/api/'
 
 new Vue({
   router,
