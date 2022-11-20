@@ -1,5 +1,8 @@
 # SistemTickect_Vue
-Test (aún en desarrollo)
+https://sistema-tikcets1-vue.vercel.app/
+
+usuario: admin
+clave: admin
 
 # sistemavue
 
